@@ -14,7 +14,7 @@ type ServerConfig struct {
 	JwtVerificationKeyPath  string `json:"jwt_verification_key_path"`
 	Store               string
 	Database            DBConfig
-	Debug 				bool `json:"debug"`
+	debug 				bool
 }
 
 type DBConnectionConfig struct {
@@ -32,9 +32,13 @@ type DBConfig struct {
 	ConnectionOptions DBConnectionConfig `json:"connection_options"`
 }
 
+func (sc ServerConfig) Debug() bool {
+	return sc.debug
+}
+
 func ParseConfig(filename string) (ServerConfig, error) {
 
-	config := ServerConfig{Debug: false}
+	config := ServerConfig{debug: true}
 
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {

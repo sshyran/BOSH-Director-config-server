@@ -80,7 +80,7 @@ JQnj8h8DPalW3Dn7oQXZhjCCeY7qK+z+KvgqDwTyv8HpP6Eetwhm
 
         BeforeEach(func() {
             config := config.ServerConfig{CertificateFilePath:"blah",
-                PrivateKeyFilePath: "blah", Debug: false}
+                PrivateKeyFilePath: "blah"}
             fakeLoader = new(fakes.FakeCertsLoader)
             generator = NewCertificateGenerator(config, fakeLoader)
 
