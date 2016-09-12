@@ -60,7 +60,7 @@ var _ = Describe("RequestHandlerConcrete", func() {
 		Context("when URL path is invalid", func() {
 			It("should return 400 Bad Request", func() {
 				invalidPaths := []string{"/v1/data/test/case", "/v1"}
-				validMethods := []string {"GET", "PUT", "POST", "DELETE"}
+				validMethods := []string{"GET", "PUT", "POST", "DELETE"}
 
 				for _, method := range validMethods {
 					for _, path := range invalidPaths {
@@ -75,7 +75,7 @@ var _ = Describe("RequestHandlerConcrete", func() {
 
 			Context("when key path parameter is missing", func() {
 				It("should return 400 Bad Request", func() {
-					validMethods := []string {"GET", "PUT", "POST", "DELETE"}
+					validMethods := []string{"GET", "PUT", "POST", "DELETE"}
 					for _, method := range validMethods {
 						req, _ := http.NewRequest(method, "/v1/data/", nil)
 						getRecorder := httptest.NewRecorder()
@@ -287,15 +287,15 @@ var _ = Describe("RequestHandlerConcrete", func() {
 						Expect(mockStore.DeleteArgsForCall(0)).To(Equal("bla"))
 					})
 
-                    It("should return 204 Status No Content", func() {
-                        req, _ := http.NewRequest("DELETE", "/v1/data/bla", nil)
-                        req.Header.Set("Authorization", "bearer fake-auth-header")
+					It("should return 204 Status No Content", func() {
+						req, _ := http.NewRequest("DELETE", "/v1/data/bla", nil)
+						req.Header.Set("Authorization", "bearer fake-auth-header")
 
-                        putRecorder := httptest.NewRecorder()
-                        requestHandler.ServeHTTP(putRecorder, req)
+						putRecorder := httptest.NewRecorder()
+						requestHandler.ServeHTTP(putRecorder, req)
 
-                        Expect(putRecorder.Code).To(Equal(http.StatusNoContent))
-                    })
+						Expect(putRecorder.Code).To(Equal(http.StatusNoContent))
+					})
 				})
 
 				Context("Key does not exist", func() {
