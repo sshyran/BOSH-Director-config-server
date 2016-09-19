@@ -39,52 +39,76 @@ jobs:
             icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
             text: {{slack_failure_message}}
 
-  - name: build
+  - name: test-acceptance
     public: true
     plan:
-      - aggregate:
-        - get: config-server
-          passed: [test-gofmt]
-          trigger: true
-        - get: config-server
-          passed: [test-unit]
-          trigger: true
-        - get: config-server
-          passed: [test-integration]
-          trigger: true
-        - get: version-semver
-          params: {bump: patch}
-      - {put: version-semver, params: {file: version-semver/number}}
-      - aggregate:
-        - task: build-linux
-          file: config-server/ci/tasks/build-linux.yml
-        - task: build-darwin
-          file: config-server/ci/tasks/build-darwin.yml
-      - aggregate:
-        - {put: release-bucket-linux, params: {file: compiled-linux/config-server-*-linux-amd64}}
-        - {put: release-bucket-darwin, params: {file: compiled-darwin/config-server-*-darwin-amd64}}
-        - {put: config-server-promoted, params: {repository: config-server, tag: version-semver/number, tag_prefix: v}}
+      - get: config-server
+        trigger: true
+        passed: [test-gofmt, test-unit, test-integration]
+      - task: bosh-release
+        file: config-server/ci/tasks/bosh-release.yml
+        on_failure:
+          put: slack-alert
+          params:
+            channel: {{slack_channel_name}}
+            icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+            text: {{slack_failure_message}}
+#      - task: test-acceptance
+#        file: config-server/ci/tasks/test-acceptance.yml
+#        privileged: true
+#        on_failure:
+#          put: slack-alert
+#          params:
+#            channel: {{slack_channel_name}}
+#            icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+#            text: {{slack_failure_message}}
 
-  - name: bump-minor
-    public: true
-    plan:
-      - get: version-semver
-        params: {bump: minor}
-      - {put: version-semver, params: {file: version-semver/number}}
-
-  - name: bump-major
-    public: true
-    plan:
-      - get: version-semver
-        params: {bump: major}
-      - {put: version-semver, params: {file: version-semver/number}}
+#  - name: build
+#    public: true
+#    plan:
+#      - aggregate:
+#        - get: config-server
+#          passed: [test-gofmt]
+#          trigger: true
+#        - get: config-server
+#          passed: [test-unit]
+#          trigger: true
+#        - get: config-server
+#          passed: [test-integration]
+#          trigger: true
+#        - get: version-semver
+#          params: {bump: patch}
+#      - {put: version-semver, params: {file: version-semver/number}}
+#      - aggregate:
+#        - task: build-linux
+#          file: config-server/ci/tasks/build-linux.yml
+#        - task: build-darwin
+#          file: config-server/ci/tasks/build-darwin.yml
+#      - aggregate:
+#        - {put: release-bucket-linux, params: {file: compiled-linux/config-server-*-linux-amd64}}
+#        - {put: release-bucket-darwin, params: {file: compiled-darwin/config-server-*-darwin-amd64}}
+#        - {put: config-server-promoted, params: {repository: config-server, tag: version-semver/number, tag_prefix: v}}
+#
+#  - name: bump-minor
+#    public: true
+#    plan:
+#      - get: version-semver
+#        params: {bump: minor}
+#      - {put: version-semver, params: {file: version-semver/number}}
+#
+#  - name: bump-major
+#    public: true
+#    plan:
+#      - get: version-semver
+#        params: {bump: major}
+#      - {put: version-semver, params: {file: version-semver/number}}
 
 resources:
   - name: config-server
     type: git
     source:
       uri: git@github.com:cloudfoundry/config-server.git
-      branch: develop
+      branch: ci-test-develop
       private_key: {{concourse_github_private_key}}
 
   - name: config-server-promoted
