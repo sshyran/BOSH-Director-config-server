@@ -39,12 +39,11 @@ jobs:
             icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
             text: {{slack_failure_message}}
 
-  - name: test-acceptance
+  - name: bosh-release
     public: true
     plan:
       - get: config-server
         trigger: true
-        passed: [test-gofmt, test-unit, test-integration]
       - task: bosh-release
         file: config-server/ci/tasks/bosh-release.yml
         on_failure:
@@ -68,13 +67,7 @@ jobs:
 #    plan:
 #      - aggregate:
 #        - get: config-server
-#          passed: [test-gofmt]
-#          trigger: true
-#        - get: config-server
-#          passed: [test-unit]
-#          trigger: true
-#        - get: config-server
-#          passed: [test-integration]
+#          passed: [test-gofmt, test-unit, test-integration]
 #          trigger: true
 #        - get: version-semver
 #          params: {bump: patch}
