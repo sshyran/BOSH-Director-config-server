@@ -129,6 +129,8 @@ jobs:
         file: config-server-release/ci/tasks/bump-and-build-bosh-release.yml
         # on_failure:
         #   <<: *slack-alert
+      - put: bosh-release
+        params: { repository: config-server-release }
 
   - name: bump-minor
     public: true
