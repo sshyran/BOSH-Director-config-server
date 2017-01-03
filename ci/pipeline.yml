@@ -71,7 +71,6 @@ jobs:
         on_failure:
           <<: *slack-alert
 
-
   - name: test-integration-postgresql
     public: true
     plan:
@@ -82,32 +81,6 @@ jobs:
         file: config-server/ci/tasks/test-integration.yml
         params:
           DB: postgresql
-        on_failure:
-          <<: *slack-alert
-
-  - name: bosh-release
-    public: true
-    plan:
-      - get: config-server-release
-        trigger: true
-        params: { submodules: all }
-      - get: bosh-cli
-      - task: bosh-release
-        file: config-server-release/ci/tasks/bosh-release.yml
-        on_failure:
-          <<: *slack-alert
-
-  - name: bump-and-build-bosh-release
-    public: true
-    plan:
-      - get: config-server-release
-        trigger: true
-        params: { submodules: all }
-      - get: config-server
-        trigger: true
-      - get: bosh-cli
-      - task: bosh-release
-        file: config-server-release/ci/tasks/bump-and-build-bosh-release.yml
         on_failure:
           <<: *slack-alert
 
@@ -131,6 +104,32 @@ jobs:
         - {put: release-bucket-darwin, params: {file: compiled-darwin/config-server-*-darwin-amd64}}
         - {put: config-server-promoted, params: {repository: config-server, tag: version-semver/number, tag_prefix: v}}
 
+  # - name: bosh-release
+  #   public: true
+  #   plan:
+  #     - get: config-server-release
+  #       trigger: true
+  #       params: { submodules: all }
+  #     - get: bosh-cli
+  #     - task: bosh-release
+  #       file: config-server-release/ci/tasks/bosh-release.yml
+  #       on_failure:
+  #         <<: *slack-alert
+
+  - name: bump-and-build-bosh-release
+    public: true
+    plan:
+      - get: config-server-release
+        passed: [build]
+        trigger: true
+        params: { submodules: all }
+      - get: config-server
+      - get: bosh-cli
+      - task: bosh-release
+        file: config-server-release/ci/tasks/bump-and-build-bosh-release.yml
+        on_failure:
+          <<: *slack-alert
+
   - name: bump-minor
     public: true
     plan:
@@ -150,7 +149,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/config-server.git
-      branch: develop
+      branch: test_pipeline
       private_key: {{config_server_concourse_github_private_key}}
 
   - name: config-server-promoted
@@ -164,7 +163,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/config-server-release.git
-      branch: develop
+      branch: test_pipeline
       private_key: {{config_server_release_concourse_github_private_key}}
 
   - name: release-bucket-linux
