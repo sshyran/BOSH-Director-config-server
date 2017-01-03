@@ -132,6 +132,7 @@ jobs:
       - put: bosh-release
         params: { repository: config-server-release }
 
+
   - name: bump-minor
     public: true
     plan:
