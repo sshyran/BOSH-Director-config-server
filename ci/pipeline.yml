@@ -93,16 +93,16 @@ jobs:
           trigger: true
         - get: version-semver
           params: {bump: patch}
-      - {put: version-semver, params: {file: version-semver/number}}
+      # - {put: version-semver, params: {file: version-semver/number}}
       - aggregate:
         - task: build-linux
           file: config-server/ci/tasks/build-linux.yml
         - task: build-darwin
           file: config-server/ci/tasks/build-darwin.yml
-      - aggregate:
-        - {put: release-bucket-linux, params: {file: compiled-linux/config-server-*-linux-amd64}}
-        - {put: release-bucket-darwin, params: {file: compiled-darwin/config-server-*-darwin-amd64}}
-        - {put: config-server-promoted, params: {repository: config-server, tag: version-semver/number, tag_prefix: v}}
+      # - aggregate:
+      #   - {put: release-bucket-linux, params: {file: compiled-linux/config-server-*-linux-amd64}}
+      #   - {put: release-bucket-darwin, params: {file: compiled-darwin/config-server-*-darwin-amd64}}
+      #   - {put: config-server-promoted, params: {repository: config-server, tag: version-semver/number, tag_prefix: v}}
 
   # - name: bosh-release
   #   public: true
@@ -120,15 +120,15 @@ jobs:
     public: true
     plan:
       - get: config-server-release
-        passed: [build]
-        trigger: true
         params: { submodules: all }
       - get: config-server
+        passed: [build]
+        trigger: true
       - get: bosh-cli
       - task: bosh-release
         file: config-server-release/ci/tasks/bump-and-build-bosh-release.yml
-        on_failure:
-          <<: *slack-alert
+        # on_failure:
+        #   <<: *slack-alert
 
   - name: bump-minor
     public: true
@@ -152,12 +152,12 @@ resources:
       branch: test_pipeline
       private_key: {{config_server_concourse_github_private_key}}
 
-  - name: config-server-promoted
-    type: git
-    source:
-      uri: git@github.com:cloudfoundry/config-server.git
-      branch: master
-      private_key: {{config_server_concourse_github_private_key}}
+  # - name: config-server-promoted
+  #   type: git
+  #   source:
+  #     uri: git@github.com:cloudfoundry/config-server.git
+  #     branch: master
+  #     private_key: {{config_server_concourse_github_private_key}}
 
   - name: config-server-release
     type: git
@@ -166,23 +166,23 @@ resources:
       branch: test_pipeline
       private_key: {{config_server_release_concourse_github_private_key}}
 
-  - name: release-bucket-linux
-    type: s3
-    source:
-      regexp: config-server-(.*)-linux-amd64
-      bucket: {{aws_s3_release_bucket}}
-      region_name: {{aws_s3_release_bucket_region}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+  # - name: release-bucket-linux
+  #   type: s3
+  #   source:
+  #     regexp: config-server-(.*)-linux-amd64
+  #     bucket: {{aws_s3_release_bucket}}
+  #     region_name: {{aws_s3_release_bucket_region}}
+  #     access_key_id: {{aws_s3_release_bucket_access_key}}
+  #     secret_access_key: {{aws_s3_release_bucket_secret_key}}
 
-  - name: release-bucket-darwin
-    type: s3
-    source:
-      regexp: config-server-(.*)-darwin-amd64
-      bucket: {{aws_s3_release_bucket}}
-      region_name: {{aws_s3_release_bucket_region}}
-      access_key_id: {{aws_s3_release_bucket_access_key}}
-      secret_access_key: {{aws_s3_release_bucket_secret_key}}
+  # - name: release-bucket-darwin
+  #   type: s3
+  #   source:
+  #     regexp: config-server-(.*)-darwin-amd64
+  #     bucket: {{aws_s3_release_bucket}}
+  #     region_name: {{aws_s3_release_bucket_region}}
+  #     access_key_id: {{aws_s3_release_bucket_access_key}}
+  #     secret_access_key: {{aws_s3_release_bucket_secret_key}}
 
   - name: version-semver
     type: semver
