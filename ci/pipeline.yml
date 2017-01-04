@@ -130,8 +130,8 @@ jobs:
         # on_failure:
         #   <<: *slack-alert
       - put: config-server-release
-        params: { repository: output/config-server-release }
-
+        params:
+          repository: output/config-server-release
 
   - name: bump-minor
     public: true
