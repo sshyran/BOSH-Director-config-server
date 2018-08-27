@@ -13,6 +13,10 @@ required = ["github.com/onsi/ginkgo/ginkgo", "github.com/maxbrunsfeld/counterfei
   version = "1.3.0"
 
 [[constraint]]
+  branch = "test-dep"
+  name = "github.com/cloudfoundry/bosh-utils"
+
+[[constraint]]
   revision = "2704adc878c21e1329f46f6e56a1c387d788ff94"
   name = "github.com/lib/pq"
 
